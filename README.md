@@ -73,6 +73,36 @@ O usa los scripts incluidos:
 9. Transferir inventario con `POST /inventory/transfer`.
 10. Consultar saldo final con `GET /inventory/report/consolidated/{product_id}` y ventas del día con `GET /sales/report/daily`.
 
+## Flujo exacto de revisión
+
+Para reproducir el enunciado completo:
+
+1. Crear `OXXO Bolivia`, `Hipermaxi` e `IC Norte`.
+2. Crear sucursales:
+   - `OXXO Bolivia / Sucursal Prado`
+   - `OXXO Bolivia / Sucursal El Alto`
+   - `Hipermaxi / Sucursal 1`
+   - `IC Norte / Melchor Pérez`
+3. Crear producto `Leche Pil 980cc`.
+4. Cargar inventario:
+   - `OXXO Bolivia / Sucursal Prado`: 100 bolsas a Bs 18.50
+   - `Hipermaxi / Sucursal 1`: 19 bolsas a Bs 22.20
+   - `IC Norte / Melchor Pérez`: 85 bolsas
+5. Registrar cliente `Juanito Pérez`.
+6. Vender 2 bolsas desde `OXXO Bolivia / Sucursal Prado` a Bs 18.50.
+7. Transferir 50 bolsas desde `Sucursal Prado` hacia `Sucursal El Alto`.
+8. Vender 1 bolsa desde `Hipermaxi / Sucursal 1` a Bs 22.20.
+9. Consultar `GET /inventory/report/consolidated/{product_id}`. Resultado esperado:
+   - `Hipermaxi / Sucursal 1`: 18 bolsas
+   - `IC Norte / Melchor Pérez`: 85 bolsas
+   - `OXXO Bolivia / Sucursal Prado`: 48 bolsas
+   - `OXXO Bolivia / Sucursal El Alto`: 50 bolsas
+10. Consultar `GET /sales/report/daily`. Resultado mínimo esperado de ventas efectivo:
+    - `Leche Pil 980cc`: 2 x 18.50 = 37.00
+    - `Leche Pil 980cc`: 1 x 22.20 = 22.20
+
+El script `.\scripts\demo-flow.ps1` ejecuta automáticamente ese flujo exacto.
+
 ## Importación Excel
 
 `POST /inventory/loadExcel` espera un archivo `.xlsx` con encabezados:

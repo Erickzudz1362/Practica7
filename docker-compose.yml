@@ -47,6 +47,8 @@ services:
     environment:
       JWT_SECRET: ${JWT_SECRET:-supermarket-dev-secret}
       DATA_DIR: /app/data
+      PRODUCT_URL: http://product-service:8002
+      COMPANY_URL: http://company-service:8001
       NOTIFICATION_URL: http://notification-service:8006
     volumes:
       - inventory-data:/app/data

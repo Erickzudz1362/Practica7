@@ -6,6 +6,7 @@ $env:NOTIFICATION_URL = "http://127.0.0.1:8006"
 $env:PRODUCT_URL = "http://127.0.0.1:8002"
 $env:INVENTORY_URL = "http://127.0.0.1:8003"
 $env:CUSTOMER_URL = "http://127.0.0.1:8004"
+$env:COMPANY_URL = "http://127.0.0.1:8001"
 
 if (-not (Test-Path ".venv")) {
   python -m venv .venv

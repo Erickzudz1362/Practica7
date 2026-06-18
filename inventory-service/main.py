@@ -1,6 +1,8 @@
+import os
 from datetime import datetime, timezone
 
-from fastapi import Depends, FastAPI, File, HTTPException, UploadFile
+import requests
+from fastapi import Depends, FastAPI, File, HTTPException, Request, UploadFile
 from openpyxl import load_workbook
 from pydantic import BaseModel, Field
 
@@ -12,6 +14,8 @@ from common.security import current_user
 app = FastAPI(title="Inventory Service", version="1.0.0")
 db = connect("inventory.db")
 LOW_STOCK_THRESHOLD = 10
+PRODUCT_URL = os.getenv("PRODUCT_URL", "http://127.0.0.1:8002")
+COMPANY_URL = os.getenv("COMPANY_URL", "http://127.0.0.1:8001")
 
 
 class InventoryInput(BaseModel):
@@ -116,6 +120,20 @@ def add_kardex(product_id: int, branch_id: int, movement_type: str, quantity: in
     )
 
 
+def auth_headers(request: Request):
+    return {"Authorization": request.headers.get("Authorization", "")}
+
+
+def get_json_or_none(url: str, request: Request):
+    try:
+        response = requests.get(url, headers=auth_headers(request), timeout=5)
+        if response.status_code >= 400:
+            return None
+        return response.json()
+    except requests.RequestException:
+        return None
+
+
 @app.get("/health")
 def health():
     return {"status": "ok", "service": "inventory-service"}
@@ -204,9 +222,29 @@ def balance(product_id: int | None = None, branch_id: int | None = None):
 
 
 @app.get("/inventory/report/consolidated/{product_id}", dependencies=[Depends(current_user)])
-def consolidated_product(product_id: int):
+def consolidated_product(product_id: int, request: Request):
     rows = rows_to_dicts(db.execute("SELECT * FROM stock WHERE product_id = ? ORDER BY branch_id", (product_id,)).fetchall())
-    return {"product_id": product_id, "total_quantity": sum(row["quantity"] for row in rows), "branches": rows}
+    product = get_json_or_none(f"{PRODUCT_URL}/products/{product_id}", request) or {"id": product_id, "name": None}
+    branches = get_json_or_none(f"{COMPANY_URL}/branches", request) or []
+    branch_map = {branch["id"]: branch for branch in branches}
+    enriched = []
+    for row in rows:
+        branch = branch_map.get(row["branch_id"], {})
+        enriched.append(
+            row
+            | {
+                "product_name": product.get("name"),
+                "branch_name": branch.get("name"),
+                "company_name": branch.get("company_name"),
+                "city_name": branch.get("city_name"),
+            }
+        )
+    return {
+        "product_id": product_id,
+        "product_name": product.get("name"),
+        "total_quantity": sum(row["quantity"] for row in rows),
+        "branches": enriched,
+    }
 
 
 @app.get("/inventory/kardex/{product_id}", dependencies=[Depends(current_user)])
