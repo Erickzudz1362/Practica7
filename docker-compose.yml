@@ -105,6 +105,30 @@ services:
     ports:
       - "8006:8006"
 
+  demo-service:
+    build:
+      context: .
+      dockerfile: demo-service/Dockerfile
+    environment:
+      JWT_SECRET: ${JWT_SECRET:-supermarket-dev-secret}
+      AUTH_URL: http://auth-service:8000
+      COMPANY_URL: http://company-service:8001
+      PRODUCT_URL: http://product-service:8002
+      INVENTORY_URL: http://inventory-service:8003
+      CUSTOMER_URL: http://customer-service:8004
+      SALES_URL: http://sales-service:8005
+      NOTIFICATION_URL: http://notification-service:8006
+    ports:
+      - "8007:8007"
+    depends_on:
+      - auth-service
+      - company-service
+      - product-service
+      - inventory-service
+      - customer-service
+      - sales-service
+      - notification-service
+
 volumes:
   auth-data:
   company-data:

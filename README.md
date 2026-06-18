@@ -13,6 +13,7 @@ Backend completo para **Abuelita Serafina SuperMarket Bolivia S.A.** con arquite
 | Customer Service | 8004 | http://localhost:8004/docs |
 | Sales Service | 8005 | http://localhost:8005/docs |
 | Notification Service | 8006 | http://localhost:8006/docs |
+| Demo Service | 8007 | http://localhost:8007/docs |
 
 ## Ejecutar con Docker
 
@@ -102,6 +103,19 @@ Para reproducir el enunciado completo:
     - `Leche Pil 980cc`: 1 x 22.20 = 22.20
 
 El script `.\scripts\demo-flow.ps1` ejecuta automáticamente ese flujo exacto.
+
+Tambien puedes ejecutar todo desde Swagger en un solo endpoint:
+
+1. Login en `http://localhost:8000/docs` con `admin / admin123`.
+2. Copia el `access_token`.
+3. Abre `http://localhost:8007/docs`.
+4. Presiona `Authorize` y pega solo el token.
+5. Ejecuta `POST /demo/review-flow`.
+
+Parametro opcional:
+
+- `official_names=false`: crea nombres con sufijo para practicar varias veces.
+- `official_names=true`: usa nombres exactos como `OXXO Bolivia`, `Hipermaxi` e `IC Norte`; usalo solo con bases limpias para evitar duplicados.
 
 ## Importación Excel
 

@@ -7,6 +7,8 @@ $env:PRODUCT_URL = "http://127.0.0.1:8002"
 $env:INVENTORY_URL = "http://127.0.0.1:8003"
 $env:CUSTOMER_URL = "http://127.0.0.1:8004"
 $env:COMPANY_URL = "http://127.0.0.1:8001"
+$env:AUTH_URL = "http://127.0.0.1:8000"
+$env:SALES_URL = "http://127.0.0.1:8005"
 
 if (-not (Test-Path ".venv")) {
   python -m venv .venv
@@ -21,7 +23,8 @@ $services = @(
   @{Name='product'; AppDir='product-service'; Port=8002},
   @{Name='inventory'; AppDir='inventory-service'; Port=8003},
   @{Name='customer'; AppDir='customer-service'; Port=8004},
-  @{Name='sales'; AppDir='sales-service'; Port=8005}
+  @{Name='sales'; AppDir='sales-service'; Port=8005},
+  @{Name='demo'; AppDir='demo-service'; Port=8007}
 )
 
 $pids = @()
@@ -35,3 +38,4 @@ $pids | ConvertTo-Json | Set-Content -Encoding UTF8 ".service-pids.json"
 Write-Host "Servicios iniciados:"
 $pids | Format-Table -AutoSize
 Write-Host "Swagger principal: http://localhost:8000/docs"
+Write-Host "Demo completa: http://localhost:8007/docs"
