@@ -1,0 +1,8 @@
+.venv/
+__pycache__/
+*.pyc
+data/
+*.db
+.env
+.service-pids.json
+.pytest_cache/

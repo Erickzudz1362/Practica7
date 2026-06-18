@@ -1,0 +1,113 @@
+services:
+  auth-service:
+    build:
+      context: .
+      dockerfile: auth-service/Dockerfile
+    environment:
+      JWT_SECRET: ${JWT_SECRET:-supermarket-dev-secret}
+      DATA_DIR: /app/data
+    volumes:
+      - auth-data:/app/data
+    ports:
+      - "8000:8000"
+
+  company-service:
+    build:
+      context: .
+      dockerfile: company-service/Dockerfile
+    environment:
+      JWT_SECRET: ${JWT_SECRET:-supermarket-dev-secret}
+      DATA_DIR: /app/data
+    volumes:
+      - company-data:/app/data
+    ports:
+      - "8001:8001"
+    depends_on:
+      - auth-service
+
+  product-service:
+    build:
+      context: .
+      dockerfile: product-service/Dockerfile
+    environment:
+      JWT_SECRET: ${JWT_SECRET:-supermarket-dev-secret}
+      DATA_DIR: /app/data
+      NOTIFICATION_URL: http://notification-service:8006
+    volumes:
+      - product-data:/app/data
+    ports:
+      - "8002:8002"
+    depends_on:
+      - notification-service
+
+  inventory-service:
+    build:
+      context: .
+      dockerfile: inventory-service/Dockerfile
+    environment:
+      JWT_SECRET: ${JWT_SECRET:-supermarket-dev-secret}
+      DATA_DIR: /app/data
+      NOTIFICATION_URL: http://notification-service:8006
+    volumes:
+      - inventory-data:/app/data
+    ports:
+      - "8003:8003"
+    depends_on:
+      - notification-service
+
+  customer-service:
+    build:
+      context: .
+      dockerfile: customer-service/Dockerfile
+    environment:
+      JWT_SECRET: ${JWT_SECRET:-supermarket-dev-secret}
+      DATA_DIR: /app/data
+      NOTIFICATION_URL: http://notification-service:8006
+    volumes:
+      - customer-data:/app/data
+    ports:
+      - "8004:8004"
+    depends_on:
+      - notification-service
+
+  sales-service:
+    build:
+      context: .
+      dockerfile: sales-service/Dockerfile
+    environment:
+      JWT_SECRET: ${JWT_SECRET:-supermarket-dev-secret}
+      DATA_DIR: /app/data
+      PRODUCT_URL: http://product-service:8002
+      INVENTORY_URL: http://inventory-service:8003
+      CUSTOMER_URL: http://customer-service:8004
+      NOTIFICATION_URL: http://notification-service:8006
+    volumes:
+      - sales-data:/app/data
+    ports:
+      - "8005:8005"
+    depends_on:
+      - product-service
+      - inventory-service
+      - customer-service
+      - notification-service
+
+  notification-service:
+    build:
+      context: .
+      dockerfile: notification-service/Dockerfile
+    environment:
+      JWT_SECRET: ${JWT_SECRET:-supermarket-dev-secret}
+      DATA_DIR: /app/data
+    volumes:
+      - notification-data:/app/data
+    ports:
+      - "8006:8006"
+
+volumes:
+  auth-data:
+  company-data:
+  product-data:
+  inventory-data:
+  customer-data:
+  sales-data:
+  notification-data:

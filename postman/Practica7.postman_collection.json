@@ -1,0 +1,130 @@
+{
+  "info": {
+    "name": "Practica 7 - Supermarket Microservices",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "token", "value": "" },
+    { "key": "company_id", "value": "1" },
+    { "key": "branch_prado", "value": "1" },
+    { "key": "branch_alto", "value": "2" },
+    { "key": "product_id", "value": "1" },
+    { "key": "customer_id", "value": "1" }
+  ],
+  "item": [
+    {
+      "name": "Login",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}" },
+        "url": "http://localhost:8000/auth/login"
+      }
+    },
+    {
+      "name": "Crear compañía OXXO Bolivia",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"name\": \"OXXO Bolivia\",\n  \"nit\": \"1234567\"\n}" },
+        "url": "http://localhost:8001/companies"
+      }
+    },
+    {
+      "name": "Crear Sucursal Prado",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"company_id\": {{company_id}},\n  \"city_id\": 1,\n  \"name\": \"Sucursal Prado\",\n  \"address\": \"Av. Prado\"\n}" },
+        "url": "http://localhost:8001/branches"
+      }
+    },
+    {
+      "name": "Crear Sucursal El Alto",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"company_id\": {{company_id}},\n  \"city_id\": 4,\n  \"name\": \"Sucursal El Alto\",\n  \"address\": \"Ceja de El Alto\"\n}" },
+        "url": "http://localhost:8001/branches"
+      }
+    },
+    {
+      "name": "Crear producto Leche Pil",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"name\": \"Leche Pil 980cc\",\n  \"category_id\": 2,\n  \"brand\": \"Pil\",\n  \"barcode\": \"779000000001\",\n  \"base_price\": 18.50,\n  \"status\": \"ACTIVE\"\n}" },
+        "url": "http://localhost:8002/products"
+      }
+    },
+    {
+      "name": "Inventario inicial 100 unidades",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"product_id\": {{product_id}},\n  \"branch_id\": {{branch_prado}},\n  \"quantity\": 100,\n  \"cost\": 12,\n  \"price\": 18.50,\n  \"reason\": \"LOTE_INICIAL\"\n}" },
+        "url": "http://localhost:8003/inventory/input"
+      }
+    },
+    {
+      "name": "Crear cliente Juanito Pérez",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"full_name\": \"Juanito Pérez\",\n  \"document\": \"7777777\",\n  \"phone\": \"70000000\"\n}" },
+        "url": "http://localhost:8004/customers"
+      }
+    },
+    {
+      "name": "Venta 2 unidades efectivo",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"customer_id\": {{customer_id}},\n  \"branch_id\": {{branch_prado}},\n  \"payment_method\": \"EFECTIVO\",\n  \"items\": [{ \"product_id\": {{product_id}}, \"quantity\": 2, \"unit_price\": 18.50 }]\n}" },
+        "url": "http://localhost:8005/sales"
+      }
+    },
+    {
+      "name": "Transferir 50 unidades",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"product_id\": {{product_id}},\n  \"from_branch_id\": {{branch_prado}},\n  \"to_branch_id\": {{branch_alto}},\n  \"quantity\": 50\n}" },
+        "url": "http://localhost:8003/inventory/transfer"
+      }
+    },
+    {
+      "name": "Venta 1 unidad a 22.20",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"customer_id\": {{customer_id}},\n  \"branch_id\": {{branch_alto}},\n  \"payment_method\": \"EFECTIVO\",\n  \"items\": [{ \"product_id\": {{product_id}}, \"quantity\": 1, \"unit_price\": 22.20 }]\n}" },
+        "url": "http://localhost:8005/sales"
+      }
+    },
+    {
+      "name": "Reporte inventario consolidado",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": "http://localhost:8003/inventory/report/consolidated/{{product_id}}"
+      }
+    },
+    {
+      "name": "Reporte ventas del día",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": "http://localhost:8005/sales/report/daily"
+      }
+    },
+    {
+      "name": "Notificaciones generadas",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": "http://localhost:8006/notifications"
+      }
+    }
+  ]
+}
